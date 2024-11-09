@@ -6,56 +6,7 @@ import EditHabit from "../EditHabit/EditHabit";
 import CompletedHabit from "../CompletedHabit/CompletedHabit";
 
 const HabitList = () => {
-  const [habits, setHabits] = React.useState([
-    {
-      id: 1,
-      title: "Excercise",
-      description: "Daily morning running",
-      streakCount: 9,
-      totalDays: 10,
-      istodayDone: true,
-    },
-    {
-      id: 2,
-      title: "Read",
-      description: "Read a book for 30 mins",
-      streakCount: 1,
-      totalDays: 20,
-      istodayDone: false,
-    },
-    {
-      id: 3,
-      title: "Excercise",
-      description: "Daily morning running",
-      streakCount: 1,
-      totalDays: 30,
-      istodayDone: false,
-    },
-    {
-      id: 4,
-      title: "Read",
-      description: "Read a book for 30 mins",
-      streakCount: 1,
-      totalDays: 40,
-      istodayDone: false,
-    },
-    {
-      id: 5,
-      title: "Excercise",
-      description: "Daily morning running",
-      streakCount: 1,
-      totalDays: 50,
-      istodayDone: false,
-    },
-    {
-      id: 6,
-      title: "Read",
-      description: "Read a book for 30 mins",
-      streakCount: 1,
-      totalDays: 60,
-      istodayDone: false,
-    },
-  ]);
+  const [habits, setHabits] = React.useState([]);
   const [showNewCard, setShowNewCard] = React.useState(false);
   const [newCard, setNewCard] = React.useState({
     title: "",
@@ -69,9 +20,11 @@ const HabitList = () => {
     fetchHabits();
   }, []);
 
+  const url = "http://localhost:3000/api/v1/habits/";
+
   const fetchHabits = async () => {
     try {
-      const response = await axios.get("http://localhost:3000/api/v1/habits/");
+      const response = await axios.get(`${url}`);
       setHabits(response.data);
     } catch (error) {
       console.error("Error while fetching habits: ", error);
@@ -88,7 +41,7 @@ const HabitList = () => {
 
   const handleDelete = async (habit) => {
     try {
-      await axios.delete(`http://localhost:3000/api/v1/habits/${habit.id}`);
+      await axios.delete(`${url}${habit._id}`);
       fetchHabits();
     } catch (error) {
       console.error("Error deleting habit:", error);
@@ -101,7 +54,7 @@ const HabitList = () => {
     } else {
       try {
         const currentDate = new Date().toISOString();
-        await axios.put(`http://localhost:5000/api/habits/${habit.id}`, {
+        await axios.patch(`${url}${habit._id}`, {
           ...habit,
           streakCount: habit.streakCount + 1,
           date: currentDate,
@@ -115,12 +68,10 @@ const HabitList = () => {
 
   const handleSave = async () => {
     try {
-      await axios.post("http://localhost:5000/api/habits", {
+      await axios.post(`${url}`, {
         ...newCard,
-        name: newCard.title,
-        description: newCard.description,
+        userId: "667b688052b65d1e5e7011ae",
       });
-      console.log(newCard);
       setShowNewCard(false);
       setNewCard({ title: "", description: "", totalDays: 0 });
       setEditHabit(null);
@@ -137,15 +88,12 @@ const HabitList = () => {
 
   const handleCancel = () => {
     setShowNewCard(false);
-    setNewCard({ title: "", description: "" });
+    setNewCard({ title: "", description: "", totalDays: 0 });
   };
 
   const handleEditSave = async () => {
     try {
-      await axios.put(
-        `http://localhost:3000/api/habits/${editHabit.id}`,
-        editHabit
-      );
+      await axios.patch(`${url}${editHabit._id}`, editHabit);
       setEditHabit(null);
       fetchHabits();
     } catch (error) {
@@ -157,7 +105,7 @@ const HabitList = () => {
     console.log(habit);
     try {
       const currentDate = new Date().toISOString();
-      await axios.put(`http://localhost:5000/api/habits/${habit.id}`, {
+      await axios.put(`${url}${habit._id}`, {
         ...habit,
         streakCount: habit.streakCount + 1,
         date: currentDate,
@@ -182,7 +130,7 @@ const HabitList = () => {
           {habits.map((habit) => {
             return (
               <HabitCard
-                key={habit.id}
+                key={habit._id}
                 habit={habit}
                 onEdit={handleEdit}
                 onDelete={handleDelete}
