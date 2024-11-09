@@ -15,8 +15,8 @@ const habitTrackerSchema = new mongoose.Schema({
     },
     trackDates: [{
         date: { type: Date, required: true },
-        completed: { type: Boolean, default: false }
+        status: { type: String, enum: ['completed', 'missed', 'pending'], default: 'pending' }
     }]
 });
 
-model.exports = mongoose.model('HabitTracker', habitTrackerSchema);
+module.exports = mongoose.model('HabitTracker', habitTrackerSchema);
