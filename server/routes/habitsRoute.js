@@ -37,8 +37,8 @@ router.get('/title/:title', function (req, res, next) {
 
 router.post('/', function(req, res, next) {
   // update post here
-  const { title, description, userId } = req.body;
-  const habit = new Habit({ title, description, userId });
+  const { title, description, userId, totalDays } = req.body;
+  const habit = new Habit({ title, description, userId, totalDays });
   
   return habit.save()
     .then(habit => {
@@ -63,11 +63,13 @@ router.delete('/:id', function(req, res, next) {
     })
 });
 
-router.patch('/', function(req, res, next) {
+router.patch('/:id', async function(req, res, next) {
   // update patch here
-  const { title, description } = req.body;
-  
-  Habit.findOneAndUpdate({ title }, { description })
+  const id = req.params.id;
+
+  const currentDate = new Date().toISOString();
+
+  Habit.findByIdAndUpdate(id, req.body , {new:true})
     .then(habit => {
       res.status(200).json(habit);
   })

@@ -1,61 +1,13 @@
 import * as React from "react";
-
+import axios from "axios";
 import HabitCard from "../HabitCard/HabitCard";
 import NewHabit from "../NewHabit/NewHabit";
 import EditHabit from "../EditHabit/EditHabit";
 import CompletedHabit from "../CompletedHabit/CompletedHabit";
+import CompletedHabitList from "../CompletedHabitList/CompletedHabitList";
 
 const HabitList = () => {
-  const [habits, setHabits] = React.useState([
-    {
-      id: 1,
-      title: "Excercise",
-      description: "Daily morning running",
-      streakCounter: 9,
-      totalDays: 10,
-      istodayDone: true,
-    },
-    {
-      id: 2,
-      title: "Read",
-      description: "Read a book for 30 mins",
-      streakCounter: 1,
-      totalDays: 20,
-      istodayDone: false,
-    },
-    {
-      id: 3,
-      title: "Excercise",
-      description: "Daily morning running",
-      streakCounter: 1,
-      totalDays: 30,
-      istodayDone: false,
-    },
-    {
-      id: 4,
-      title: "Read",
-      description: "Read a book for 30 mins",
-      streakCounter: 1,
-      totalDays: 40,
-      istodayDone: false,
-    },
-    {
-      id: 5,
-      title: "Excercise",
-      description: "Daily morning running",
-      streakCounter: 1,
-      totalDays: 50,
-      istodayDone: false,
-    },
-    {
-      id: 6,
-      title: "Read",
-      description: "Read a book for 30 mins",
-      streakCounter: 1,
-      totalDays: 60,
-      istodayDone: false,
-    },
-  ]);
+  const [habits, setHabits] = React.useState([]);
   const [showNewCard, setShowNewCard] = React.useState(false);
   const [newCard, setNewCard] = React.useState({
     title: "",
@@ -69,10 +21,12 @@ const HabitList = () => {
     fetchHabits();
   }, []);
 
-  const fetchHabits = () => {
+  const url = "http://localhost:3000/api/v1/habits/";
+
+  const fetchHabits = async () => {
     try {
-      // const response = await axios.get('http://localhost:5000/api/habits');
-      // setHabits(response.data);
+      const response = await axios.get(`${url}`);
+      setHabits(response.data);
     } catch (error) {
       console.error("Error while fetching habits: ", error);
     }
@@ -86,22 +40,33 @@ const HabitList = () => {
     setEditHabit(habit);
   };
 
-  const handleDelete = (habit) => {
+  const handleDelete = async (habit) => {
     try {
-      // await axios.delete(`http://localhost:5000/api/habits/${habit.id}`);
+      await axios.delete(`${url}${habit._id}`);
       fetchHabits();
     } catch (error) {
       console.error("Error deleting habit:", error);
     }
   };
 
-  const handleComplete = (habit) => {
-    if (habit.totalDays - habit.streakCounter === 1) {
+  const handleComplete = async (habit) => {
+    if (habit.totalDays - habit.streakCount === 1) {
       setCompletedHabit(habit);
-    } else {
+    } 
+    // else if(habit.istodayDone){
+    //   return
+    // }
+    else {
       try {
         const currentDate = new Date().toISOString();
-        // await axios.put(`http://localhost:5000/api/habits/${habit.id}`, { ...habit, streakCounter: habit.streakCounter + 1, date: currentDate });
+        await axios.patch(
+          `http://localhost:3000/api/v1/habittracker/marktoday`,
+          {
+            ...habit,
+            streakCount: habit.streakCount + 1,
+            date: currentDate,
+          }
+        );
         fetchHabits();
       } catch (error) {
         console.error("Error completing habit:", error);
@@ -109,10 +74,12 @@ const HabitList = () => {
     }
   };
 
-  const handleSave = () => {
+  const handleSave = async () => {
     try {
-      // await axios.post('http://localhost:5000/api/habits', newHabit);
-      console.log(newCard);
+      await axios.post(`${url}`, {
+        ...newCard,
+        userId: "667b688052b65d1e5e7011ae",
+      });
       setShowNewCard(false);
       setNewCard({ title: "", description: "", totalDays: 0 });
       setEditHabit(null);
@@ -129,13 +96,12 @@ const HabitList = () => {
 
   const handleCancel = () => {
     setShowNewCard(false);
-    setNewCard({ title: "", description: "" });
+    setNewCard({ title: "", description: "", totalDays: 0 });
   };
 
   const handleEditSave = async () => {
     try {
-      console.log(editHabit);
-      // await axios.put(`http://localhost:5000/api/habits/${editHabit.id}`, editHabit);
+      await axios.patch(`${url}${editHabit._id}`, editHabit);
       setEditHabit(null);
       fetchHabits();
     } catch (error) {
@@ -143,11 +109,18 @@ const HabitList = () => {
     }
   };
 
-  const handleCompletedHabit = (habit) => {
+  const handleCompletedHabit = async (habit) => {
     console.log(habit);
     try {
       const currentDate = new Date().toISOString();
-        // await axios.put(`http://localhost:5000/api/habits/${habit.id}`, { ...habit, streakCounter: habit.streakCounter + 1, date: currentDate });
+      await axios.patch(
+        `http://localhost:3000/api/v1/habittracker/marktoday`,
+        {
+          ...habit,
+          streakCount: habit.streakCount + 1,
+          date: currentDate,
+        }
+      );
       fetchHabits();
       setCompletedHabit(null);
     } catch (error) {
@@ -160,23 +133,35 @@ const HabitList = () => {
     setEditHabit({ ...editHabit, [name]: value });
   };
 
+  const completedHabits = habits.filter(
+    (habit) => habit.totalDays === habit.streakCount
+  );
+
+  const inProgressHabits = habits.filter(
+    (habit) => habit.totalDays !== habit.streakCount
+  );
+
   return (
     <div className="m-4 h-full">
       <div className="w-full">
-        <h3 className="mx-4 my-2">Your Habits</h3>
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-          {habits.map((habit) => {
-            return (
-              <HabitCard
-                key={habit.id}
-                habit={habit}
-                onEdit={handleEdit}
-                onDelete={handleDelete}
-                onComplete={handleComplete}
-              />
-            );
-          })}
-        </div>
+        {inProgressHabits.length > 0 && (
+          <>
+            <h3 className="mx-4 my-2">In Progress Habits</h3>
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+              {inProgressHabits.map((habit) => {
+                return (
+                  <HabitCard
+                    key={habit._id}
+                    habit={habit}
+                    onEdit={handleEdit}
+                    onDelete={handleDelete}
+                    onComplete={handleComplete}
+                  />
+                );
+              })}
+            </div>
+          </>
+        )}
       </div>
       {completedHabit && (
         <CompletedHabit
@@ -184,18 +169,30 @@ const HabitList = () => {
           handleCompletedHabit={handleCompletedHabit}
         />
       )}
-      <div className="w-1/2">
-        <h3 className="mx-4 my-2">
-          Add New Habit by clicking the below plus icon
-        </h3>
-        <NewHabit
-          showNewCard={showNewCard}
-          handleAdd={handleAdd}
-          handleCancel={handleCancel}
-          newCard={newCard}
-          handleSave={handleSave}
-          handleNewCardChange={handleNewCardChange}
-        />
+      <div className="w-full flex">
+        <div className="w-1/2">
+          <h3 className="mx-4 my-2">
+            Add New Habit by clicking the below plus icon
+          </h3>
+          <NewHabit
+            showNewCard={showNewCard}
+            handleAdd={handleAdd}
+            handleCancel={handleCancel}
+            newCard={newCard}
+            handleSave={handleSave}
+            handleNewCardChange={handleNewCardChange}
+          />
+        </div>
+        {completedHabits.length > 0 && (
+          <div className="w-1/2 p-4 overflow-y-auto h-screen">
+            <CompletedHabitList
+              completedHabits={completedHabits}
+              handleEdit={handleEdit}
+              handleDelete={handleDelete}
+              handleComplete={handleComplete}
+            />
+          </div>
+        )}
       </div>
       <EditHabit
         editHabit={editHabit}

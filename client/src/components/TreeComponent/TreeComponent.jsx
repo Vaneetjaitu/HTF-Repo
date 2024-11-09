@@ -16,13 +16,13 @@ const Tree = ({ progress }) => {
 };
 
 const TreeComponent = (props) => {
-  const { totalDays, streakCounter } = props;
+  const { totalDays, streakCount } = props;
 
   return (
     <div className="app">
-      <Tree progress={streakCounter / totalDays} />
+      <Tree progress={streakCount / totalDays} />
       <p>
-        Current Day: {streakCounter} / {totalDays}
+        Current Day: {streakCount} / {totalDays}
       </p>
     </div>
   );

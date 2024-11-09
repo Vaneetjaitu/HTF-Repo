@@ -13,6 +13,8 @@ const habitsTrackerRouter = require('./routes/habittracker');
 const mongoose = require('mongoose');
 
 const app = express();
+const cors = require('cors')
+app.use(cors())
 
 app.use(logger('dev'));
 app.use(express.json());
