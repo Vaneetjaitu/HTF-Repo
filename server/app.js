@@ -20,9 +20,12 @@ app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
-mongoose.connect(process.env.MONGODB_URL || 'mongodb://localhost:27017/HFT-REPO')
-.then(() => console.log('MongoDB Connected'))
-.catch(err => console.error(err));
+const DB = process.env.MONGODB_URL || 'mongodb://localhost:27017/HFT-REPO';
+mongoose
+  .connect(DB)
+  .then(() => {
+    console.log('DB conn is successfull!');
+  });
 
 app.use('/', indexRouter);
 app.use('/api/v1/users', usersRouter);
@@ -32,18 +35,19 @@ app.use('/api/v1/habittracker', habitsTrackerRouter);
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
   const err = createError(404);
-  res.send(err)
+  res.send("error");
 });
 
 // error handler
-app.use(function(err, req, res, next) {
-  // set locals, only providing error in development
-  res.locals.message = err.message;
-  res.locals.error = req.app.get('env') === 'development' ? err : {};
-
-  // render the error page
-  res.status(err.status || 500);
-  res.render('error');
+const port = process.env.PORT || 3000;
+const server = app.listen(port, () => {
+  console.log(`App running on ${port}...`);
 });
 
-module.exports = app;
+process.on('unhandledRejection', (err) => {
+  console.log('Unhandled rejection 💥 shutting down');
+  console.log(err.name, err.message);
+  server.close(() => {
+    process.exit(1);
+  });
+});

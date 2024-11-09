@@ -2,13 +2,12 @@ const express = require('express');
 const router = express.Router();
 const Habit = require('../models/habitModel');
 
+
 router.get('/', function (req, res, next) {
   Habit.find().then(habits => {
-    console.log("hello1");
-    res.status(200).send(habits);
-    console.log("hello");
+    res.status(200).json(habits);
   }).catch(err => {
-    res.status(400).send(err);
+    res.status(400).json(err);
   })
 })
 
@@ -17,10 +16,10 @@ router.get('/id/:id', function (req, res, next) {
   const id = req.params.id;
   return Habit.findById(id)
     .then(habit => {
-      res.send(habit);
+      res.json(habit);
     })
     .catch(err => {
-      res.status(400).send(err);
+      res.status(400).json(err);
     })
 });
 
@@ -29,24 +28,24 @@ router.get('/name/:name', function (req, res, next) {
   const name = req.params.name;
   return Habit.findOne({ name })
     .then(habit => {
-      res.send(habit);
+      res.json(habit);
     })
     .catch(err => {
-      res.status(400).send(err);
+      res.status(400).json(err);
     })
 });
 
 router.post('/', function(req, res, next) {
   // update post here
-  const { name, description } = req.body;
-
-  const habit = new Habit({ name, description });
+  const { name, description, userId } = req.body;
+  const habit = new Habit({ name, description, userId });
+  
   return habit.save()
     .then(habit => {
-      res.status(201).send(habit);
+      res.status(201).json(habit);
     })
     .catch(err => {
-      res.status(400).send(err);
+      res.status(400).json(err);
     })
 });
 
@@ -57,10 +56,10 @@ router.delete('/:id', function(req, res, next) {
 
   Habit.findByIdAndDelete(id)
     .then(habit => {
-      res.status(204).send(habit);
+      res.status(204).json(habit);
     })
     .catch(err => {
-      res.status(400).send(err);
+      res.status(400).json(err);
     })
 });
 
@@ -70,10 +69,10 @@ router.patch('/', function(req, res, next) {
 
   Habit.findOneAndUpdate({ name }, { description })
     .then(habit => {
-      res.status(200).send(habit);
+      res.status(200).json(habit);
   })
   .catch(err => {
-    res.status(400).send(err);
+    res.status(400).json(err);
   })
 });
 

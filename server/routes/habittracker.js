@@ -1,7 +1,11 @@
 const express = require('express');
+const router = express.Router();
 const HabitTracker = require("../models/habitsTrackerModel");
 const Habit = require('../models/habitModel');
-const router = express.Router();
+
+router.get('/', async (req, res) => {
+    res.json('Habit Tracker');    
+})
 
 // Route for marking habit completion
 router.post('/markcompletion', async (req, res) => {
@@ -63,12 +67,12 @@ router.post('/markcompletion', async (req, res) => {
 });
 
 
-router.get('/trackprogress', async (req, res) => {
-    const { habitId, userId } = req.query;
-
+router.get('/trackprogress/:userId/:habitId', async (req, res) => {
+    const { habitId, userId } = req.params;
+    console.log(habitId, userId);
     try {
-        const habitTracker = await HabitTracker.findOne({ habit: habitId, user: userId });
-
+        const habitTracker = await HabitTracker.findOne({habit: habitId, user: userId });
+        console.log(habitId, userId);
         if (!habitTracker) {
             return res.status(404).json({ message: 'No habit tracker found for this user and habit' });
         }
@@ -79,12 +83,12 @@ router.get('/trackprogress', async (req, res) => {
     }
 })
 
-router.get('/habitdetails', async (req, res) => {
-    const { habitId } = req.query;
-
+router.get('/habitdetails/:habitId', async (req, res) => {
+    const { habitId } = req.params;
+    
     try {
         const habit = await Habit.findById(habitId);
-
+        console.log(habit);
         if (!habit) {
             return res.status(404).json({ message: 'Habit not found' });
         }
