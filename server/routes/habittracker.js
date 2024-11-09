@@ -98,5 +98,24 @@ router.get('/habitdetails/:habitId', async (req, res) => {
         res.status(500).json({ message: 'Error fetching habit details', error });
     }
 });
+
+router.patch('/marktoday/', async (req,res)=>{
+    const { _id,streakCount,date } = req.body;
+    try{
+        const habit = await Habit.findById(_id);
+        let d = new Date();
+        let sendDate=new Date(date)
+        if(d.toDateString()===sendDate.toDateString()){
+            await Habit.findByIdAndUpdate(_id,{streakCount:streakCount,istodayDone:true});
+        }
+        res.status(200).json({ message: 'Habit updated', habit });
+    }catch(err){
+        console.error('Error fetching habit details:', error);
+        res.status(500).json({ message: 'Error fetching habit details', error });
+    }
+
+    
+
+});
 module.exports = router;
 
