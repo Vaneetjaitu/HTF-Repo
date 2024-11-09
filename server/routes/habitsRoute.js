@@ -23,10 +23,10 @@ router.get('/id/:id', function (req, res, next) {
     })
 });
 
-router.get('/name/:name', function (req, res, next) {
-  // find by name
-  const name = req.params.name;
-  return Habit.findOne({ name })
+router.get('/title/:title', function (req, res, next) {
+  // find by title
+  const title = req.params.title;
+  return Habit.findOne({ title: title })
     .then(habit => {
       res.json(habit);
     })
@@ -37,8 +37,8 @@ router.get('/name/:name', function (req, res, next) {
 
 router.post('/', function(req, res, next) {
   // update post here
-  const { name, description, userId } = req.body;
-  const habit = new Habit({ name, description, userId });
+  const { title, description, userId } = req.body;
+  const habit = new Habit({ title, description, userId });
   
   return habit.save()
     .then(habit => {
