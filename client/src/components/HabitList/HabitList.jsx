@@ -4,6 +4,7 @@ import HabitCard from "../HabitCard/HabitCard";
 import NewHabit from "../NewHabit/NewHabit";
 import EditHabit from "../EditHabit/EditHabit";
 import CompletedHabit from "../CompletedHabit/CompletedHabit";
+import CompletedHabitList from "../CompletedHabitList/CompletedHabitList";
 
 const HabitList = () => {
   const [habits, setHabits] = React.useState([]);
@@ -51,14 +52,21 @@ const HabitList = () => {
   const handleComplete = async (habit) => {
     if (habit.totalDays - habit.streakCount === 1) {
       setCompletedHabit(habit);
-    } else {
+    } 
+    // else if(habit.istodayDone){
+    //   return
+    // }
+    else {
       try {
         const currentDate = new Date().toISOString();
-        await axios.patch(`${url}${habit._id}`, {
-          ...habit,
-          streakCount: habit.streakCount + 1,
-          date: currentDate,
-        });
+        await axios.patch(
+          `http://localhost:3000/api/v1/habittracker/marktoday`,
+          {
+            ...habit,
+            streakCount: habit.streakCount + 1,
+            date: currentDate,
+          }
+        );
         fetchHabits();
       } catch (error) {
         console.error("Error completing habit:", error);
@@ -105,11 +113,14 @@ const HabitList = () => {
     console.log(habit);
     try {
       const currentDate = new Date().toISOString();
-      await axios.put(`${url}${habit._id}`, {
-        ...habit,
-        streakCount: habit.streakCount + 1,
-        date: currentDate,
-      });
+      await axios.patch(
+        `http://localhost:3000/api/v1/habittracker/marktoday`,
+        {
+          ...habit,
+          streakCount: habit.streakCount + 1,
+          date: currentDate,
+        }
+      );
       fetchHabits();
       setCompletedHabit(null);
     } catch (error) {
@@ -122,23 +133,35 @@ const HabitList = () => {
     setEditHabit({ ...editHabit, [name]: value });
   };
 
+  const completedHabits = habits.filter(
+    (habit) => habit.totalDays === habit.streakCount
+  );
+
+  const inProgressHabits = habits.filter(
+    (habit) => habit.totalDays !== habit.streakCount
+  );
+
   return (
     <div className="m-4 h-full">
       <div className="w-full">
-        <h3 className="mx-4 my-2">Your Habits</h3>
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-          {habits.map((habit) => {
-            return (
-              <HabitCard
-                key={habit._id}
-                habit={habit}
-                onEdit={handleEdit}
-                onDelete={handleDelete}
-                onComplete={handleComplete}
-              />
-            );
-          })}
-        </div>
+        {inProgressHabits.length > 0 && (
+          <>
+            <h3 className="mx-4 my-2">In Progress Habits</h3>
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+              {inProgressHabits.map((habit) => {
+                return (
+                  <HabitCard
+                    key={habit._id}
+                    habit={habit}
+                    onEdit={handleEdit}
+                    onDelete={handleDelete}
+                    onComplete={handleComplete}
+                  />
+                );
+              })}
+            </div>
+          </>
+        )}
       </div>
       {completedHabit && (
         <CompletedHabit
@@ -146,18 +169,30 @@ const HabitList = () => {
           handleCompletedHabit={handleCompletedHabit}
         />
       )}
-      <div className="w-1/2">
-        <h3 className="mx-4 my-2">
-          Add New Habit by clicking the below plus icon
-        </h3>
-        <NewHabit
-          showNewCard={showNewCard}
-          handleAdd={handleAdd}
-          handleCancel={handleCancel}
-          newCard={newCard}
-          handleSave={handleSave}
-          handleNewCardChange={handleNewCardChange}
-        />
+      <div className="w-full flex">
+        <div className="w-1/2">
+          <h3 className="mx-4 my-2">
+            Add New Habit by clicking the below plus icon
+          </h3>
+          <NewHabit
+            showNewCard={showNewCard}
+            handleAdd={handleAdd}
+            handleCancel={handleCancel}
+            newCard={newCard}
+            handleSave={handleSave}
+            handleNewCardChange={handleNewCardChange}
+          />
+        </div>
+        {completedHabits.length > 0 && (
+          <div className="w-1/2 p-4 overflow-y-auto h-screen">
+            <CompletedHabitList
+              completedHabits={completedHabits}
+              handleEdit={handleEdit}
+              handleDelete={handleDelete}
+              handleComplete={handleComplete}
+            />
+          </div>
+        )}
       </div>
       <EditHabit
         editHabit={editHabit}

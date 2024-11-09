@@ -37,8 +37,8 @@ router.get('/title/:title', function (req, res, next) {
 
 router.post('/', function(req, res, next) {
   // update post here
-  const { title, description, userId } = req.body;
-  const habit = new Habit({ title, description, userId });
+  const { title, description, userId, totalDays } = req.body;
+  const habit = new Habit({ title, description, userId, totalDays });
   
   return habit.save()
     .then(habit => {

@@ -6,7 +6,7 @@ import TreeComponent from "../TreeComponent/TreeComponent";
 const HabitCard = (props) => {
   const { habit, onEdit, onDelete, onComplete } = props;
   return (
-    <Card className="m-4 p-4">
+    <Card className="m-4 p-4" disabled={habit.totalDays === habit.streakCount}>
       <CardContent>
         <Typography
           className="w-full text-center !mb-4"
@@ -26,17 +26,23 @@ const HabitCard = (props) => {
           totalDays={habit.totalDays}
           streakCount={habit.streakCount}
         />
-        <div className="flex justify-center space-x-2 mt-4">
-          <IconButton onClick={() => onEdit(habit)}>
-            <Edit />
-          </IconButton>
-          <IconButton onClick={() => onDelete(habit)}>
-            <Delete />
-          </IconButton>
-          <IconButton onClick={() => onComplete(habit)}>
-            <CheckCircle className={habit.istodayDone ? "completed" : ""} />
-          </IconButton>
-        </div>
+        {habit.totalDays === habit.streakCount ? (
+          <Typography variant="h6" color="primary">
+            Congratulations! You've completed this habit.
+          </Typography>
+        ) : (
+          <div className="flex justify-center space-x-2 mt-4">
+            <IconButton onClick={() => onEdit(habit)}>
+              <Edit />
+            </IconButton>
+            <IconButton onClick={() => onDelete(habit)}>
+              <Delete />
+            </IconButton>
+            <IconButton onClick={() => onComplete(habit)}>
+              <CheckCircle className={habit.istodayDone ? "completed" : ""} />
+            </IconButton>
+          </div>
+        )}
       </CardContent>
     </Card>
   );
