@@ -1,5 +1,5 @@
 import * as React from "react";
-
+import axios from "axios";
 import HabitCard from "../HabitCard/HabitCard";
 import NewHabit from "../NewHabit/NewHabit";
 import EditHabit from "../EditHabit/EditHabit";
@@ -11,7 +11,7 @@ const HabitList = () => {
       id: 1,
       title: "Excercise",
       description: "Daily morning running",
-      streakCounter: 9,
+      streakCount: 9,
       totalDays: 10,
       istodayDone: true,
     },
@@ -19,7 +19,7 @@ const HabitList = () => {
       id: 2,
       title: "Read",
       description: "Read a book for 30 mins",
-      streakCounter: 1,
+      streakCount: 1,
       totalDays: 20,
       istodayDone: false,
     },
@@ -27,7 +27,7 @@ const HabitList = () => {
       id: 3,
       title: "Excercise",
       description: "Daily morning running",
-      streakCounter: 1,
+      streakCount: 1,
       totalDays: 30,
       istodayDone: false,
     },
@@ -35,7 +35,7 @@ const HabitList = () => {
       id: 4,
       title: "Read",
       description: "Read a book for 30 mins",
-      streakCounter: 1,
+      streakCount: 1,
       totalDays: 40,
       istodayDone: false,
     },
@@ -43,7 +43,7 @@ const HabitList = () => {
       id: 5,
       title: "Excercise",
       description: "Daily morning running",
-      streakCounter: 1,
+      streakCount: 1,
       totalDays: 50,
       istodayDone: false,
     },
@@ -51,7 +51,7 @@ const HabitList = () => {
       id: 6,
       title: "Read",
       description: "Read a book for 30 mins",
-      streakCounter: 1,
+      streakCount: 1,
       totalDays: 60,
       istodayDone: false,
     },
@@ -69,10 +69,10 @@ const HabitList = () => {
     fetchHabits();
   }, []);
 
-  const fetchHabits = () => {
+  const fetchHabits = async () => {
     try {
-      // const response = await axios.get('http://localhost:5000/api/habits');
-      // setHabits(response.data);
+      const response = await axios.get("http://localhost:3000/api/v1/habits/");
+      setHabits(response.data);
     } catch (error) {
       console.error("Error while fetching habits: ", error);
     }
@@ -86,22 +86,26 @@ const HabitList = () => {
     setEditHabit(habit);
   };
 
-  const handleDelete = (habit) => {
+  const handleDelete = async (habit) => {
     try {
-      // await axios.delete(`http://localhost:5000/api/habits/${habit.id}`);
+      await axios.delete(`http://localhost:3000/api/v1/habits/${habit.id}`);
       fetchHabits();
     } catch (error) {
       console.error("Error deleting habit:", error);
     }
   };
 
-  const handleComplete = (habit) => {
-    if (habit.totalDays - habit.streakCounter === 1) {
+  const handleComplete = async (habit) => {
+    if (habit.totalDays - habit.streakCount === 1) {
       setCompletedHabit(habit);
     } else {
       try {
         const currentDate = new Date().toISOString();
-        // await axios.put(`http://localhost:5000/api/habits/${habit.id}`, { ...habit, streakCounter: habit.streakCounter + 1, date: currentDate });
+        await axios.put(`http://localhost:5000/api/habits/${habit.id}`, {
+          ...habit,
+          streakCount: habit.streakCount + 1,
+          date: currentDate,
+        });
         fetchHabits();
       } catch (error) {
         console.error("Error completing habit:", error);
@@ -109,9 +113,13 @@ const HabitList = () => {
     }
   };
 
-  const handleSave = () => {
+  const handleSave = async () => {
     try {
-      // await axios.post('http://localhost:5000/api/habits', newHabit);
+      await axios.post("http://localhost:5000/api/habits", {
+        ...newCard,
+        name: newCard.title,
+        description: newCard.description,
+      });
       console.log(newCard);
       setShowNewCard(false);
       setNewCard({ title: "", description: "", totalDays: 0 });
@@ -134,8 +142,10 @@ const HabitList = () => {
 
   const handleEditSave = async () => {
     try {
-      console.log(editHabit);
-      // await axios.put(`http://localhost:5000/api/habits/${editHabit.id}`, editHabit);
+      await axios.put(
+        `http://localhost:3000/api/habits/${editHabit.id}`,
+        editHabit
+      );
       setEditHabit(null);
       fetchHabits();
     } catch (error) {
@@ -143,11 +153,15 @@ const HabitList = () => {
     }
   };
 
-  const handleCompletedHabit = (habit) => {
+  const handleCompletedHabit = async (habit) => {
     console.log(habit);
     try {
       const currentDate = new Date().toISOString();
-        // await axios.put(`http://localhost:5000/api/habits/${habit.id}`, { ...habit, streakCounter: habit.streakCounter + 1, date: currentDate });
+      await axios.put(`http://localhost:5000/api/habits/${habit.id}`, {
+        ...habit,
+        streakCount: habit.streakCount + 1,
+        date: currentDate,
+      });
       fetchHabits();
       setCompletedHabit(null);
     } catch (error) {

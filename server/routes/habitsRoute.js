@@ -63,11 +63,13 @@ router.delete('/:id', function(req, res, next) {
     })
 });
 
-router.patch('/', function(req, res, next) {
+router.patch('/:id', async function(req, res, next) {
   // update patch here
-  const { name, description } = req.body;
+  const id = req.params.id;
 
-  Habit.findOneAndUpdate({ name }, { description })
+  const currentDate = new Date().toISOString();
+
+  Habit.findByIdAndUpdate(id, req.body , {new:true})
     .then(habit => {
       res.status(200).json(habit);
   })

@@ -24,7 +24,7 @@ const HabitCard = (props) => {
         </Typography>
         <TreeComponent
           totalDays={habit.totalDays}
-          streakCounter={habit.streakCounter}
+          streakCount={habit.streakCount}
         />
         <div className="flex justify-center space-x-2 mt-4">
           <IconButton onClick={() => onEdit(habit)}>
