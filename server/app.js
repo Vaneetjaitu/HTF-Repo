@@ -4,9 +4,10 @@ var path = require('path');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
 
-var indexRouter = require('./routes/index');
-var usersRouter = require('./routes/users');
-var habitsRouter = require('./routes/habits');
+var indexRouter = require('./routes/indexRoute');
+var usersRouter = require('./routes/userRoute');
+var habitsRouter = require('./routes/habitsRoute');
+const mongoose = require('mongoose');
 
 var app = express();
 
@@ -15,6 +16,10 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
+
+mongoose.connect('mongodb://localhost:27017/HFT-REPO')
+.then(() => console.log('MongoDB Connected'))
+.catch(err => console.error(err));
 
 app.use('/', indexRouter);
 app.use('/users', usersRouter);
