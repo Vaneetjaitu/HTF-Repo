@@ -21,8 +21,8 @@ const TreeComponent = (props) => {
   return (
     <div className="app">
       <Tree progress={streakCount / totalDays} />
-      <p>
-        Current Day: {streakCount} / {totalDays}
+      <p className="w-full text-center">
+        Streak: {streakCount}/{totalDays}
       </p>
     </div>
   );
