@@ -1,0 +1,28 @@
+.tree-container {
+  display: flex;
+  justify-content: center;
+  align-items: flex-end;
+  height: 300px; /* Adjust as needed */
+  border: 1px solid #ccc;
+  margin: 20px;
+}
+
+.tree {
+  width: 50px; /* Adjust as needed */
+  background-color: green;
+  border-radius: 10px;
+  transition: height 0.5s ease;
+}
+
+.controls {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  margin-top: 20px;
+}
+
+button {
+  padding: 10px 20px;
+  font-size: 16px;
+  cursor: pointer;
+}
