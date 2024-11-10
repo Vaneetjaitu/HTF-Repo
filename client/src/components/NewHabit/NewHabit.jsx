@@ -1,12 +1,26 @@
 import * as React from "react";
-import {TextField, Button, Card, CardContent, Typography, Fab } from '@mui/material';
+import {
+  TextField,
+  Button,
+  Card,
+  CardContent,
+  Typography,
+  Fab,
+} from "@mui/material";
 import { Add, Close } from "@mui/icons-material";
 
-
 const NewHabit = (props) => {
-  const { showNewCard, handleAdd, handleCancel, newCard, handleSave, handleNewCardChange } = props;
+  const {
+    ref,
+    showNewCard,
+    handleAdd,
+    handleCancel,
+    newCard,
+    handleSave,
+    handleNewCardChange,
+  } = props;
   return (
-    <>
+    <div ref={ref}>
       {showNewCard && (
         <Card className="m-4 p-4">
           <CardContent>
@@ -58,15 +72,15 @@ const NewHabit = (props) => {
           showNewCard ? "justify-center" : "justify-start mt-10 mx-4"
         }`}
       >
-      <Fab
-        color="primary"
-        aria-label="add"
-        onClick={showNewCard ? handleCancel : handleAdd}
-      >
-        {showNewCard ? <Close /> : <Add />}
-      </Fab>
+        <Fab
+          color="primary"
+          aria-label="add"
+          onClick={showNewCard ? handleCancel : handleAdd}
+        >
+          {showNewCard ? <Close /> : <Add />}
+        </Fab>
       </div>
-    </>
+    </div>
   );
 };
 

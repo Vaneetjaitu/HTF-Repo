@@ -16,10 +16,17 @@ const HabitList = () => {
   });
   const [editHabit, setEditHabit] = React.useState(null);
   const [completedHabit, setCompletedHabit] = React.useState(null);
+  const ref = React.useRef(null);
 
   React.useEffect(() => {
     fetchHabits();
   }, []);
+
+  React.useEffect(() => {
+    if (showNewCard && ref.current) {
+      ref.current.scrollIntoView({ behaviour: "smooth" });
+    }
+  }, [showNewCard]);
 
   const url = "http://localhost:3000/api/v1/habits/";
 
@@ -52,7 +59,7 @@ const HabitList = () => {
   const handleComplete = async (habit) => {
     if (habit.totalDays - habit.streakCount === 1) {
       setCompletedHabit(habit);
-    } 
+    }
     // else if(habit.istodayDone){
     //   return
     // }
@@ -113,14 +120,11 @@ const HabitList = () => {
     console.log(habit);
     try {
       const currentDate = new Date().toISOString();
-      await axios.patch(
-        `http://localhost:3000/api/v1/habittracker/marktoday`,
-        {
-          ...habit,
-          streakCount: habit.streakCount + 1,
-          date: currentDate,
-        }
-      );
+      await axios.patch(`http://localhost:3000/api/v1/habittracker/marktoday`, {
+        ...habit,
+        streakCount: habit.streakCount + 1,
+        date: currentDate,
+      });
       fetchHabits();
       setCompletedHabit(null);
     } catch (error) {
@@ -175,6 +179,7 @@ const HabitList = () => {
             Add New Habit by clicking the below plus icon
           </h3>
           <NewHabit
+            ref={ref}
             showNewCard={showNewCard}
             handleAdd={handleAdd}
             handleCancel={handleCancel}
